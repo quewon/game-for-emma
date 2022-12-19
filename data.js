@@ -44,7 +44,7 @@ var DATA = {
     return events;
   },
   sortPriority: function(events) {
-    return events.sort((a,b) => a.PRIORITY - b.PRIORITY);
+    return events.sort((a,b) => b.PRIORITY - a.PRIORITY);
   },
   random: function(events) {
     return events[events.length * Math.random() | 0];
