@@ -79,6 +79,10 @@ function SheetArrayToObjects(array) {
           break;
       }
       
+      if (keys[x] == "PRIORITY") {
+        value = parseInt(value);
+      }
+      
       entry[keys[x]] = value;
     }
     
@@ -110,6 +114,8 @@ function updateData(sheetName, data) {
       if (e[property] == undefined) e[property] = defaultEvent[property];
     }
   }
+  
+  DATA.events.shift(0);
   
   DATA.titlesByCharacter = {};
   for (let title of DATA.titles) {
