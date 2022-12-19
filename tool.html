@@ -25,6 +25,10 @@
     li {
       white-space: pre;
     }
+    
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
   </style>
   <body>
     
@@ -46,9 +50,17 @@
         <label for="day">day</label>
         <input type="number" name="day" value="-1" min="-1" max="30">
         
-        <label for="haspriority">has priority</label>
-        <input type="checkbox" name="haspriority" value="">
+        <input type="checkbox" name="haspriority" value=""><label for="haspriority">has priority</label>
+        
         <br>
+        <br>
+        
+        must have characters:
+        
+        <div id="hascharacters"></div>
+        
+        <br>
+        
         <button type="button" name="button" onclick="listEvents()">list events with parameters</button>
         <button type="button" name="button" onclick="randomEvent()">random event from parameters</button>
         <hr>
@@ -68,6 +80,9 @@
           
         </ul>
       </div>
+      <div class="column">
+        <a href="https://docs.google.com/spreadsheets/d/12LRk-GIPdW4VH__u2xkyaCEBtbDq6UDpVR8cWgReOSo/edit#gid=0" target="_blank">open google sheets</a>
+      </div>
     </div>
     
   </body>
@@ -79,13 +94,33 @@
     var hasPriorityElement = document.getElementsByName("haspriority")[0];
     var characterElement = document.getElementsByName("character")[0];
     
+    var hasCharactersElement = document.getElementById("hascharacters");
+    
     function on_data_loaded() {
+      for (let character in DATA.titlesByCharacter) {
+        let option = document.createElement("option");
+        option.innerHTML = character;
+        characterElement.appendChild(option);
+        
+        let label = document.createElement("label");
+        label.for = character;
+        label.innerHTML = character;
+        let checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = character;
+        
+        hasCharactersElement.appendChild(checkbox);
+        hasCharactersElement.appendChild(label);
+      }
+      
       for (let location of DATA.locations) {
         let option = document.createElement("option");
         option.innerHTML = location.NAME;
         option.value = location.ID;
         locationElement.appendChild(option);
       }
+      
+      listEvents();
     }
     
     const eventsElement = document.getElementById("events");
@@ -97,7 +132,14 @@
       var day = dayElement.value;
       var hasPriority = hasPriorityElement.checked;
       
-      return DATA.sortPriority(DATA.retrieve(location, phase, day, hasPriority));
+      var characters = [];
+      for (let child of hasCharactersElement.children) {
+        if (child.checked) {
+          characters.push(child.name);
+        }
+      }
+      
+      return DATA.sortPriority(DATA.retrieve(location, phase, day, hasPriority, characters.length > 0 ? characters : null));
     }
     
     function listEvents() {

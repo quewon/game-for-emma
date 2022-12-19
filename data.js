@@ -1,7 +1,7 @@
 var SHEETS = ["events", "titles", "locations"];
 
 var DATA = {
-  retrieve: function(location, phase, day, hasPriority) {
+  retrieve: function(location, phase, day, hasPriority, characters) {
     var events = [];
     
     location = location || "-1";
@@ -13,6 +13,30 @@ var DATA = {
       if (phase != "-1" && e.PHASE != phase) continue;
       if (day != "-1" && e.DAY != day) continue;
       if (hasPriority && e.PRIORITY == "-1") continue;
+      
+      if (characters) {
+        if (e.CHARACTERS == undefined) continue;
+        
+        var missingCharacter = false;
+        for (let name of characters) {
+          if (!e.CHARACTERS.includes(name)) {
+            missingCharacter = true;
+            break;
+          }
+        }
+        
+        if (missingCharacter) continue;
+        
+        // var containsIrrelevantCharacter = false;
+        // for (let name of e.CHARACTERS.split(", ")) {
+        //   if (!characters.includes(name)) {
+        //     containsIrrelevantCharacter = true;
+        //     break;
+        //   }
+        // }
+        // 
+        // if (containsIrrelevantCharacter) continue;
+      }
       
       events.push(e);
     }
@@ -79,15 +103,18 @@ function updateData(sheetName, data) {
   
   // refine data
   
-  DATA.titlesByCharacter = {};
+  const defaultEvent = DATA.events[0];
+  for (let i=1; i<DATA.events.length; i++) {
+    var e = DATA.events[i];
+    for (let property in e) {
+      if (e[property] == undefined) e[property] = defaultEvent[property];
+    }
+  }
   
+  DATA.titlesByCharacter = {};
   for (let title of DATA.titles) {
     if (!(title.CHARACTER in DATA.titlesByCharacter)) {
       DATA.titlesByCharacter[title.CHARACTER] = [];
-      
-      let option = document.createElement("option");
-      option.innerHTML = title.CHARACTER;
-      characterElement.appendChild(option);
     }
     
     DATA.titlesByCharacter[title.CHARACTER].push(title);
