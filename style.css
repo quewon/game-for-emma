@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,500;1,300;1,500&display=swap');
+
+body {
+  overflow: hidden;
+  
+  --card-width: 30vh;
+  --card-height: 40vh;
+  
+  --prompt-color: gray;
+  
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  /* font-family: 'Nanum Myeongjo', serif; */
+  font-weight: 300;
+  line-height: 20px;
+  
+  /* font-smooth: never;
+  -webkit-font-smoothing: none; */
+}
+
+#container {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: calc(var(--card-height) + 5em);
+  overflow-x: visible;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  padding-top: 5em;
+  box-sizing: border-box;
+}
+
+.card {
+  scroll-snap-align: center;
+  position: relative;
+  display: block;
+  margin: auto;
+  width: var(--card-width);
+  height: var(--card-height);
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  margin-bottom: 5em;
+  box-sizing: border-box;
+  padding: 1em;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.card a {
+  border-bottom: 1px solid white;
+  background: black;
+  color: white;
+  cursor: pointer;
+}
+.card a:hover {
+  box-sizing: border-box;
+  border-color: black;
+  background: transparent;
+  color: black;
+}
+
+.card img {
+  position: absolute;
+  bottom: .5em;
+  left: 1em;
+  max-width: 40%;
+  /* image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  shape-rendering: crispEdges; */
+}
+
+.card.borderless {
+  box-shadow: none;
+}
+
+.card.scrollprompt::before {
+  content: "scroll to continue...";
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: calc(var(--card-height) + .7em);
+  left: 0;
+  /* font-style: italic; */
+  font-size: .9em;
+  color: var(--prompt-color);
+}

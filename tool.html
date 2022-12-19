@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <style media="screen">
+    body {
+      margin: 0;
+    }
+    
+    #container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .column {
+      height: 100%;
+      border: 1px solid black;
+      margin: 1em;
+      padding: 1em;
+    }
+    
+    li {
+      white-space: pre;
+    }
+  </style>
+  <body>
+    
+    <div id="container">
+      <div class="column">
+        <label for="location">location</label>
+        <select name="location" value="any">
+          <option value="-1">any</option>
+        </select>
+        
+        <label for="phase">phase</label>
+        <select name="phase" value="any">
+          <option value="-1">any</option>
+          <option value="0">morning</option>
+          <option value="1">afternoon</option>
+          <option value="2">evening</option>
+        </select>
+        
+        <label for="day">day</label>
+        <input type="number" name="day" value="-1" min="-1" max="30">
+        
+        <label for="haspriority">has priority</label>
+        <input type="checkbox" name="haspriority" value="">
+        <br>
+        <button type="button" name="button" onclick="listEvents()">list events with parameters</button>
+        <button type="button" name="button" onclick="randomEvent()">random event from parameters</button>
+        <hr>
+        
+        <ul id="events">
+          
+        </ul>
+      </div>
+      <div class="column">
+        <label for="character">character</label>
+        <select name="character" value="all">
+          <option value="">all</option>
+        </select>
+        <button type="button" name="button" onclick="listTitles()">list titles with parameters</button>
+        <hr>
+        <ul id="titles">
+          
+        </ul>
+      </div>
+    </div>
+    
+  </body>
+  <script type="text/javascript" src="data.js"></script>
+  <script type="text/javascript">
+    var locationElement = document.getElementsByName("location")[0];
+    var phaseElement = document.getElementsByName("phase")[0];
+    var dayElement = document.getElementsByName("day")[0];
+    var hasPriorityElement = document.getElementsByName("haspriority")[0];
+    var characterElement = document.getElementsByName("character")[0];
+    
+    function on_data_loaded() {
+      for (let location of DATA.locations) {
+        let option = document.createElement("option");
+        option.innerHTML = location.NAME;
+        option.value = location.ID;
+        locationElement.appendChild(option);
+      }
+    }
+    
+    const eventsElement = document.getElementById("events");
+    const titlesElement = document.getElementById("titles");
+    
+    function getEventsByParameter() {
+      var location = locationElement.value;
+      var phase = phaseElement.value;
+      var day = dayElement.value;
+      var hasPriority = hasPriorityElement.checked;
+      
+      return DATA.sortPriority(DATA.retrieve(location, phase, day, hasPriority));
+    }
+    
+    function listEvents() {
+      var newList = [];
+      
+      for (let e of getEventsByParameter()) {
+        var li = document.createElement("li");
+        li.innerHTML = e.TEXT;
+        newList.push(li);
+      }
+      
+      eventsElement.replaceChildren(...newList);
+    }
+    
+    function randomEvent() {
+      var newList = [];
+      var e = DATA.random(getEventsByParameter());
+      
+      var li = document.createElement("li");
+      li.innerHTML = e.TEXT;
+      newList.push(li);
+      
+      eventsElement.replaceChildren(...newList);
+    }
+    
+    function listTitles() {
+      var newList = [];
+      
+      if (!(characterElement.value in DATA.titlesByCharacter)) {
+        for (let title of DATA.titles) {
+          var li = document.createElement("li");
+          li.textContent = title.TITLE;
+          newList.push(li);
+        }
+      } else {
+        for (let title of DATA.titlesByCharacter[characterElement.value]) {
+          var li = document.createElement("li");
+          li.textContent = title.TITLE;
+          newList.push(li);
+        }
+      }
+      
+      titlesElement.replaceChildren(...newList);
+    }
+  </script>
+</html>
