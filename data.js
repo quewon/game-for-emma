@@ -4,15 +4,15 @@ var DATA = {
   retrieve: function(location, phase, day, hasPriority, characters) {
     var events = [];
     
-    location = location || "-1";
-    phase = phase || "-1";
-    day = day || "-1";
+    location = location == null ? -1 : location;
+    phase = phase == null ? -1 : phase;
+    day = day == null ? -1 : day;
     
     for (let e of DATA.events) {
-      if (location != "-1" && e.LOCATION != location) continue;
-      if (phase != "-1" && e.PHASE != phase) continue;
-      if (day != "-1" && e.DAY != day) continue;
-      if (hasPriority && e.PRIORITY == "-1") continue;
+      if (location != -1 && e.LOCATION != location) continue;
+      if (phase != -1 && e.PHASE != phase) continue;
+      if (day != -1 && e.DAY != day) continue;
+      if (hasPriority && e.PRIORITY == -1) continue;
       
       if (characters) {
         if (e.CHARACTERS == undefined) continue;
@@ -41,14 +41,72 @@ var DATA = {
       events.push(e);
     }
     
+    events = DATA.sort(events, "PRIORITY");
+    events = DATA.sort(events, "LOCATION");
+    events = DATA.sort(events, "PHASE");
+    events = DATA.sort(events, "DAY");
+    events = events.sort((a,b) => a.pulled - b.pulled);
+    
     return events;
   },
-  sortPriority: function(events) {
-    return events.sort((a,b) => b.PRIORITY - a.PRIORITY);
+  retrieveInclusive: function(location, phase, day) { //used in-game... events that are not tied to a specific requirement are included
+    var events = [];
+    
+    location = location == null ? -1 : location;
+    phase = phase == null ? -1 : phase;
+    day = day == null ? -1 : day;
+    
+    for (let e of DATA.events) {
+      if (location != -1 && e.LOCATION != -1 && e.LOCATION != location) continue;
+      if (phase != -1 && e.PHASE != -1 && e.PHASE != phase) continue;
+      if (day != -1 && e.DAY != -1 && e.DAY != day) continue;
+      
+      events.push(e);
+    }
+    
+    events = DATA.sort(events, "PRIORITY");
+    events = DATA.sort(events, "LOCATION");
+    events = DATA.sort(events, "PHASE");
+    events = DATA.sort(events, "DAY");
+    events = events.sort((a,b) => a.pulled - b.pulled); // sort by pulled, remove pulled
+    
+    // sort
+    
+    var minPulled = events[0].pulled;
+    events = events.filter((e) => {
+      return e.pulled <= minPulled;
+    });
+    
+    var topPriority = events[0].PRIORITY;
+    events = events.filter((e) => {
+      return e.PRIORITY >= topPriority;
+    });
+    
+    var topLocation = events[0].LOCATION;
+    events = events.filter((e) => {
+      return e.LOCATION >= topLocation;
+    });
+    
+    var topPhase = events[0].PHASE;
+    events = events.filter((e) => {
+      return e.PHASE >= topPhase;
+    });
+    
+    var topDay = events[0].DAY;
+    events = events.filter((e) => {
+      return e.DAY >= topDay;
+    });
+    
+    return events;
   },
-  random: function(events) {
-    return events[events.length * Math.random() | 0];
-  }
+  sort: function(events, property) {
+    return events.sort((a,b) => b[property] - a[property] );
+  },
+  pull: function(events, markEvent) {
+    var e = events[events.length * Math.random() | 0];
+    if (markEvent) e.pulled += 1;
+    return e;
+  },
 };
 
 const API_KEY = "AIzaSyAm47kRXdo7Umk0e7TkVwdGwAq10vNEEyE";
@@ -79,7 +137,8 @@ function SheetArrayToObjects(array) {
           break;
       }
       
-      if (keys[x] == "PRIORITY") {
+      if (keys[x] == "PRIORITY" || keys[x] == "PHASE" || keys[x] == "DAY" || keys[x] == "LOCATION" || keys[x] == "pulled") {
+        if (!value) value = -1;
         value = parseInt(value);
       }
       

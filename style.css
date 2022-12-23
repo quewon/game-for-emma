@@ -1,3 +1,5 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,500;1,300;1,500&display=swap'); */
+
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,500;1,300;1,500&display=swap');
 
 body {
@@ -11,6 +13,7 @@ body {
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   /* font-family: 'Nanum Myeongjo', serif; */
+  /* font-weight: lighter; */
   font-weight: 300;
   line-height: 20px;
   
@@ -18,33 +21,45 @@ body {
   -webkit-font-smoothing: none; */
 }
 
+b {
+  font-weight: 500;
+}
+
 #container {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
-  width: 100%;
-  height: calc(var(--card-height) + 5em);
+  width: 200%;
+  transform: translate(-25%, -50%);
+  height: calc(var(--card-height) + 3em);
   overflow-x: visible;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
-  padding-top: 5em;
   box-sizing: border-box;
+  padding-top: 10px;
 }
 
 .card {
-  scroll-snap-align: center;
+  box-sizing: border-box;
+  scroll-snap-align: start;
   position: relative;
   display: block;
   margin: auto;
   width: var(--card-width);
   height: var(--card-height);
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  /* box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; */
+  border: .5px solid gray;
   margin-bottom: 5em;
-  box-sizing: border-box;
   padding: 1em;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+  opacity: 1;
+  animation: fade-in 500ms;
+}
+
+@keyframes fade-in {
+  from { opacity: 0 }
+  to { opacity: 1 }
 }
 
 .card a {
@@ -72,16 +87,36 @@ body {
 
 .card.borderless {
   box-shadow: none;
+  border: none;
 }
 
-.card.scrollprompt::before {
+.card:nth-last-child(1)::before {
   content: "scroll to continue...";
   position: absolute;
   width: 100%;
   text-align: center;
-  top: calc(var(--card-height) + .7em);
+  top: -5.2em;
+  /* top: calc(var(--card-height) + .7em); */
   left: 0;
   /* font-style: italic; */
   font-size: .9em;
   color: var(--prompt-color);
+}
+
+.card.done {
+  pointer-events: none;
+}
+
+table {
+  -webkit-border-horizontal-spacing: 0;
+  -webkit-border-vertical-spacing: 0;
+  margin-bottom: 1em;
+}
+
+a {
+  display: none;
+}
+
+a.selected {
+  display: inline;
 }

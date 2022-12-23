@@ -7,30 +7,147 @@
   </head>
   <body>
     
-    <button type="button" name="button" onclick="location.href='tool.html'">TOOL</button>
-    
     <div id="container">
-      
-      <div class="card scrollprompt">
-        rush hour leaves you tired. your coworker <a>hands you a can of soda when their break starts</a>.
-        <img src="assets/cat.svg" alt="cat">
-      </div>
-      <div class="card">
-        
-      </div>
-      <div class="card">
-        
-      </div>
-      
     </div>
     
   </body>
   <script type="text/javascript" src="data.js"></script>
   <script type="text/javascript">
-    //DATA;
+  var container = document.getElementById("container");
+  var containerPaddingTop = parseInt(window.getComputedStyle(container, null).getPropertyValue('padding-top'));
   
-    function on_data_loaded() {
-      
+  var statuses = {
+    money: ["struggling", "scraping by", "fine", "comfortable", "wealthy"],
+    energy: ["like death", "tired", "calm", "excited", "bouncing off the walls"],
+    focus: ["shot", "confused", "steady", "sharp", "in the flow"],
+  };
+  
+  var player = {
+    money: 2,
+    energy: 0,
+    focus: 0,
+    day: 0,
+    phase: 0,
+    location: 0,
+    titles: {},
+    nextEvent: null,
+  };
+  
+  function parseEventText(html) {
+    return html;
+  }
+  
+  function updateNextEvent() {
+    player.nextEvent = DATA.pull(
+      DATA.retrieveInclusive(player.location, player.phase, player.day), 
+      false
+    );
+  }
+  
+  function updateLastCard() {
+    var card = createEventCard();
+    console.log(player.nextEvent);
+    container.lastElementChild.replaceWith(card);
+  }
+  
+  function createStatusCard() {
+    var div = document.createElement("div");
+    div.innerHTML = `<table>
+        <tr>
+          <td style="width: 50%;"><b>money</b></td>
+          <td>`+statuses.money[player.money]+`</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;"><b>energy</b></td>
+          <td>`+statuses.energy[player.energy]+`</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;"><b>focus</b></td>
+          <td>`+statuses.focus[player.focus]+`</td>
+        </tr>
+      </table>`;
+    div.classList.add("card");
+    div.classList.add("borderless");
+    
+    var aparent = document.createElement("div");
+    var a1 = document.createElement("a");
+    a1.textContent = "stay home";
+    var a2 = document.createElement("a");
+    a2.textContent = "go to school";
+    var a3 = document.createElement("a");
+    a3.textContent = "get to work";
+    a1.classList.add("selected");
+    a1.onclick = function() {
+      player.location = 1;
+      updateNextEvent();
+      updateLastCard();
+      this.classList.remove("selected");
+      this.nextElementSibling.classList.add("selected");
+    };
+    a2.onclick = function() {
+      player.location = 2;
+      updateNextEvent();
+      updateLastCard();
+      this.classList.remove("selected");
+      this.nextElementSibling.classList.add("selected");
+    };
+    a3.onclick = function() {
+      player.location = 0;
+      updateNextEvent();
+      updateLastCard();
+      this.classList.remove("selected");
+      this.parentElement.firstElementChild.classList.add("selected");
+    };
+    aparent.appendChild(a1);
+    aparent.appendChild(a2);
+    aparent.appendChild(a3);
+    div.appendChild(aparent);
+    
+    return div;
+  }
+  
+  function createEventCard() {
+    var e = player.nextEvent;
+    
+    var el = document.createElement("div");
+    el.classList.add("card");
+    el.innerHTML = parseEventText(e.TEXT);
+    
+    var images = document.createElement("div");
+    images.classList.add("images");
+    var characters = e.CHARACTERS.split(", ");
+    for (let name of characters) {
+      var img = document.createElement("img");
+      img.src = "assets/"+name+".svg";
+      img.alt = name;
+      images.appendChild(img);
     }
+    el.appendChild(images);
+    
+    return el;
+  }
+  
+  container.onscroll = function(e) {
+    let child = container.lastElementChild;
+    if (container.scrollTop >= child.offsetTop - containerPaddingTop) {
+      child.previousElementSibling.classList.add("done");
+      player.nextEvent.pulled += 1;
+      container.scrollTo(0, container.scrollTop);
+      updateNextEvent();
+      if (child.classList.contains("borderless")) {
+        container.appendChild(createEventCard());
+      } else {
+        container.appendChild(createStatusCard());
+        player.location = 0;
+      }
+    }
+  }
+  
+  function on_data_loaded() {
+    // generate first event
+    container.appendChild(createStatusCard());
+    updateNextEvent();
+    container.appendChild(createEventCard());
+  }
   </script>
 </html>

@@ -139,7 +139,7 @@
         }
       }
       
-      return DATA.sortPriority(DATA.retrieve(location, phase, day, hasPriority, characters.length > 0 ? characters : null));
+      return DATA.sort(DATA.retrieve(parseInt(location), parseInt(phase), parseInt(day), hasPriority, characters.length > 0 ? characters : null), "PRIORITY");
     }
     
     function listEvents() {
@@ -156,7 +156,7 @@
     
     function randomEvent() {
       var newList = [];
-      var e = DATA.random(getEventsByParameter());
+      var e = DATA.pull(getEventsByParameter(), false);
       
       var li = document.createElement("li");
       li.innerHTML = e.TEXT;
