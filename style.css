@@ -2,9 +2,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,500;1,300;1,500&display=swap');
 
-body {
-  overflow: hidden;
-  
+:root {
   --card-width: 30vh;
   --card-height: 40vh;
   
@@ -12,13 +10,11 @@ body {
   
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
-  /* font-family: 'Nanum Myeongjo', serif; */
-  /* font-weight: lighter; */
+}
+
+body {
+  overflow: hidden;
   font-weight: 300;
-  line-height: 20px;
-  
-  /* font-smooth: never;
-  -webkit-font-smoothing: none; */
 }
 
 b {
@@ -30,12 +26,26 @@ b {
   top: 50%;
   width: 200%;
   transform: translate(-25%, -50%);
-  height: calc(var(--card-height) + 3em);
-  overflow-x: visible;
+  height: calc(var(--card-height) + 3rem);
+  overflow-x: hidden;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   box-sizing: border-box;
-  padding-top: 10px;
+  /* padding-top: 10px; */
+}
+
+@media (max-device-width: 480px) {
+  :root {
+    --card-width: 90vw;
+    --card-height: 120vw;
+    font-size: 60px;
+  }
+  
+  #container {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .card {
@@ -48,8 +58,8 @@ b {
   height: var(--card-height);
   /* box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; */
   border: .5px solid gray;
-  margin-bottom: 5em;
-  padding: 1em;
+  margin-bottom: 5rem;
+  padding: 1rem;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
@@ -77,9 +87,9 @@ b {
 
 .card img {
   position: absolute;
-  bottom: .5em;
-  left: 1em;
-  max-width: 40%;
+  bottom: .5rem;
+  left: 1rem;
+  width: calc(var(--card-width) * .4);
   /* image-rendering: crisp-edges;
   image-rendering: pixelated;
   shape-rendering: crispEdges; */
@@ -95,11 +105,11 @@ b {
   position: absolute;
   width: 100%;
   text-align: center;
-  top: -5.2em;
+  top: -4.5rem;
   /* top: calc(var(--card-height) + .7em); */
   left: 0;
   /* font-style: italic; */
-  font-size: .9em;
+  font-size: .9rem;
   color: var(--prompt-color);
 }
 
@@ -110,7 +120,7 @@ b {
 table {
   -webkit-border-horizontal-spacing: 0;
   -webkit-border-vertical-spacing: 0;
-  margin-bottom: 1em;
+  margin-bottom: 1rem;
 }
 
 a {

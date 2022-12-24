@@ -64,43 +64,46 @@ var DATA = {
       events.push(e);
     }
     
-    events = DATA.sort(events, "PRIORITY");
-    events = DATA.sort(events, "LOCATION");
-    events = DATA.sort(events, "PHASE");
-    events = DATA.sort(events, "DAY");
-    events = events.sort((a,b) => a.pulled - b.pulled); // sort by pulled, remove pulled
-    
     // sort
     
+    events = DATA.sort(events, "pulled");
     var minPulled = events[0].pulled;
     events = events.filter((e) => {
       return e.pulled <= minPulled;
     });
     
+    console.log(events);
+    
+    events = DATA.sort(events, "PRIORITY");
     var topPriority = events[0].PRIORITY;
     events = events.filter((e) => {
-      return e.PRIORITY >= topPriority;
+      return e.PRIORITY <= topPriority;
     });
     
-    var topLocation = events[0].LOCATION;
+    events = DATA.sort(events, "LOCATION");
+    var topLocation = events[events.length - 1].LOCATION;
     events = events.filter((e) => {
       return e.LOCATION >= topLocation;
     });
     
-    var topPhase = events[0].PHASE;
+    events = DATA.sort(events, "PHASE");
+    var topPhase = events[events.length - 1].PHASE;
     events = events.filter((e) => {
       return e.PHASE >= topPhase;
     });
     
-    var topDay = events[0].DAY;
+    events = DATA.sort(events, "DAY");
+    var topDay = events[events.length - 1].DAY;
     events = events.filter((e) => {
       return e.DAY >= topDay;
     });
     
+    console.log(events);
+    
     return events;
   },
   sort: function(events, property) {
-    return events.sort((a,b) => b[property] - a[property] );
+    return events.sort((a,b) => b[property] < a[property] );
   },
   pull: function(events, markEvent) {
     var e = events[events.length * Math.random() | 0];
@@ -137,7 +140,14 @@ function SheetArrayToObjects(array) {
           break;
       }
       
-      if (keys[x] == "PRIORITY" || keys[x] == "PHASE" || keys[x] == "DAY" || keys[x] == "LOCATION" || keys[x] == "pulled") {
+      if (
+        keys[x] == "PRIORITY" || 
+        keys[x] == "PHASE" || 
+        keys[x] == "DAY" || 
+        keys[x] == "LOCATION" || 
+        keys[x] == "choice" || 
+        keys[x] == "pulled"
+      ) {
         if (!value) value = -1;
         value = parseInt(value);
       }

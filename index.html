@@ -14,7 +14,6 @@
   <script type="text/javascript" src="data.js"></script>
   <script type="text/javascript">
   var container = document.getElementById("container");
-  var containerPaddingTop = parseInt(window.getComputedStyle(container, null).getPropertyValue('padding-top'));
   
   var statuses = {
     money: ["struggling", "scraping by", "fine", "comfortable", "wealthy"],
@@ -38,6 +37,11 @@
   }
   
   function updateNextEvent() {
+    player.phase++;
+    if (player.phase >= 3) {
+      player.phase = 0;
+      player.day++;
+    }
     player.nextEvent = DATA.pull(
       DATA.retrieveInclusive(player.location, player.phase, player.day), 
       false
@@ -46,7 +50,6 @@
   
   function updateLastCard() {
     var card = createEventCard();
-    console.log(player.nextEvent);
     container.lastElementChild.replaceWith(card);
   }
   
@@ -127,16 +130,27 @@
     return el;
   }
   
+  function applyResults(results) {
+    
+  }
+  
   container.onscroll = function(e) {
     let child = container.lastElementChild;
-    if (container.scrollTop >= child.offsetTop - containerPaddingTop) {
+    if (container.scrollTop >= child.offsetTop) {
       child.previousElementSibling.classList.add("done");
-      player.nextEvent.pulled += 1;
       container.scrollTo(0, container.scrollTop);
-      updateNextEvent();
       if (child.classList.contains("borderless")) {
+        updateNextEvent();
         container.appendChild(createEventCard());
       } else {
+        // apply effects of event
+        applyResults(player.nextEvent.CONSEQUENCE);
+        if (player.nextEvent["HAS CHOICES"]) {
+          applyResults(player.nextEvent["CHOICE"+player.nextEvent.choice+" CONSEQUENCE"]);
+        }
+        player.nextEvent.pulled += 1;
+        console.log("pulled "+player.nextEvent.TEXT);
+        
         container.appendChild(createStatusCard());
         player.location = 0;
       }
@@ -148,6 +162,8 @@
     container.appendChild(createStatusCard());
     updateNextEvent();
     container.appendChild(createEventCard());
+    
+    container.scrollTo(0, 0);
   }
   </script>
 </html>
