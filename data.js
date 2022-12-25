@@ -72,8 +72,6 @@ var DATA = {
       return e.pulled <= minPulled;
     });
     
-    console.log(events);
-    
     events = DATA.sort(events, "PRIORITY");
     var topPriority = events[0].PRIORITY;
     events = events.filter((e) => {
@@ -97,8 +95,6 @@ var DATA = {
     events = events.filter((e) => {
       return e.DAY >= topDay;
     });
-    
-    console.log(events);
     
     return events;
   },

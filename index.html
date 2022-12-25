@@ -16,16 +16,39 @@
   var container = document.getElementById("container");
   
   var statuses = {
-    money: ["struggling", "scraping by", "fine", "comfortable", "wealthy"],
-    energy: ["like death", "tired", "calm", "excited", "bouncing off the walls"],
-    focus: ["shot", "confused", "steady", "sharp", "in the flow"],
+    money: [
+      "money wise, you're struggling.", 
+      "money wise, you're scraping by.", 
+      "money wise, you're fine.", 
+      "money wise, you're comfortable.", 
+      "you are wealthy."
+    ],
+    energy: [
+      "you feel like death.", 
+      "you feel tired.", 
+      "you feel calm.", 
+      "you feel excited.", 
+      "you're bouncing off the walls."
+    ],
+    focus: [
+      "your focus is shot.", 
+      "you're filled with confusion.", 
+      "you're going steady.", 
+      "your focus is sharp.", 
+      "you're in the flow."
+    ],
+    phase: [
+      "morning",
+      "afternoon",
+      "evening"
+    ]
   };
   
   var player = {
     money: 2,
     energy: 0,
     focus: 0,
-    day: 0,
+    day: 1,
     phase: 0,
     location: 0,
     titles: {},
@@ -55,24 +78,11 @@
   
   function createStatusCard() {
     var div = document.createElement("div");
-    div.innerHTML = `<table>
-        <tr>
-          <td style="width: 50%;"><b>money</b></td>
-          <td>`+statuses.money[player.money]+`</td>
-        </tr>
-        <tr>
-          <td style="width: 50%;"><b>energy</b></td>
-          <td>`+statuses.energy[player.energy]+`</td>
-        </tr>
-        <tr>
-          <td style="width: 50%;"><b>focus</b></td>
-          <td>`+statuses.focus[player.focus]+`</td>
-        </tr>
-      </table>`;
     div.classList.add("card");
     div.classList.add("borderless");
+    div.innerHTML = ""+statuses.phase[player.phase]+". day "+player.day+" of winter break.<br><br>"+statuses.energy[player.energy]+" "+statuses.focus[player.focus]+" "+statuses.money[player.money]+" you decide to <span></span>.";
     
-    var aparent = document.createElement("div");
+    var span = document.createElement("span");
     var a1 = document.createElement("a");
     a1.textContent = "stay home";
     var a2 = document.createElement("a");
@@ -101,10 +111,11 @@
       this.classList.remove("selected");
       this.parentElement.firstElementChild.classList.add("selected");
     };
-    aparent.appendChild(a1);
-    aparent.appendChild(a2);
-    aparent.appendChild(a3);
-    div.appendChild(aparent);
+    span.appendChild(a1);
+    span.appendChild(a2);
+    span.appendChild(a3);
+    
+    div.querySelector("span").replaceWith(span);
     
     return div;
   }
@@ -149,7 +160,6 @@
           applyResults(player.nextEvent["CHOICE"+player.nextEvent.choice+" CONSEQUENCE"]);
         }
         player.nextEvent.pulled += 1;
-        console.log("pulled "+player.nextEvent.TEXT);
         
         container.appendChild(createStatusCard());
         player.location = 0;
