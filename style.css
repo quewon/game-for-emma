@@ -130,3 +130,35 @@ a {
 a.selected {
   display: inline;
 }
+
+a.solo {
+  border: none;
+  background: white;
+  color: black;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+}
+
+.dialogue {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  border: .5px solid gray;
+  border-radius: 30px;
+  padding: .5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+.dialogue::after {
+  content: attr(data-name);
+  position: absolute;
+  top: -.4rem;
+  left: 1.5rem;
+  background: white;
+  font-size: .8rem;
+  text-transform: uppercase;
+}

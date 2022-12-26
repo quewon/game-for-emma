@@ -55,10 +55,6 @@
     nextEvent: null,
   };
   
-  function parseEventText(html) {
-    return html;
-  }
-  
   function updateNextEvent() {
     player.phase++;
     if (player.phase >= 3) {
@@ -85,35 +81,55 @@
     var span = document.createElement("span");
     var a1 = document.createElement("a");
     a1.textContent = "stay home";
-    var a2 = document.createElement("a");
-    a2.textContent = "go to school";
-    var a3 = document.createElement("a");
-    a3.textContent = "get to work";
     a1.classList.add("selected");
-    a1.onclick = function() {
-      player.location = 1;
-      updateNextEvent();
-      updateLastCard();
-      this.classList.remove("selected");
-      this.nextElementSibling.classList.add("selected");
-    };
-    a2.onclick = function() {
-      player.location = 2;
-      updateNextEvent();
-      updateLastCard();
-      this.classList.remove("selected");
-      this.nextElementSibling.classList.add("selected");
-    };
-    a3.onclick = function() {
-      player.location = 0;
-      updateNextEvent();
-      updateLastCard();
-      this.classList.remove("selected");
-      this.parentElement.firstElementChild.classList.add("selected");
-    };
-    span.appendChild(a1);
-    span.appendChild(a2);
-    span.appendChild(a3);
+    
+    if (player.energy >= DATA.locations[1]["ENERGY REQUIREMENT"]) {
+      var a2 = document.createElement("a");
+      a2.textContent = "go to school";
+      var a3 = document.createElement("a");
+      a3.textContent = "get to work";
+      a1.onclick = function() {
+        player.location = 1;
+        updateNextEvent();
+        updateLastCard();
+        this.classList.remove("selected");
+        this.nextElementSibling.classList.add("selected");
+      };
+      
+      if (player.energy < DATA.locations[2]["ENERGY REQUIREMENT"]) {
+        a2.onclick = function() {
+          player.location = 0;
+          updateNextEvent();
+          updateLastCard();
+          this.classList.remove("selected");
+          this.parentElement.firstElementChild.classList.add("selected");
+        };
+        span.appendChild(a1);
+        span.appendChild(a2);
+      } else {
+        a2.onclick = function() {
+          if (player.energy < DATA.locations[2]["ENERGY REQUIREMENT"]) return;
+          player.location = 2;
+          updateNextEvent();
+          updateLastCard();
+          this.classList.remove("selected");
+          this.nextElementSibling.classList.add("selected");
+        };
+        a3.onclick = function() {
+          player.location = 0;
+          updateNextEvent();
+          updateLastCard();
+          this.classList.remove("selected");
+          this.parentElement.firstElementChild.classList.add("selected");
+        };
+        span.appendChild(a1);
+        span.appendChild(a2);
+        span.appendChild(a3);
+      }
+    } else {
+      a1.classList.add("solo");
+      span.appendChild(a1);
+    }
     
     div.querySelector("span").replaceWith(span);
     
@@ -125,7 +141,52 @@
     
     var el = document.createElement("div");
     el.classList.add("card");
-    el.innerHTML = parseEventText(e.TEXT);
+    
+    // parse dialogue
+    let lines = e.TEXT.split("\n");
+    let chars = Object.keys(DATA.titlesByCharacter);
+    e.TEXT = "";
+    for (let line of lines) {
+      if (line.includes(": ") && chars.some(el => line.indexOf(el) == 0)) {
+        let char = line.split(": ")[0];
+        let dialogue = line.split(": ")[1];
+        e.TEXT += "<div class='dialogue' data-name='"+char+"'>"+dialogue+"</div>";
+      } else {
+        e.TEXT += line;
+      }
+      e.TEXT += "<br><br>";
+    }
+    
+    if (e.TEXT.includes("[[")) {
+      let sub = e.TEXT.substring(e.TEXT.indexOf("[["), e.TEXT.indexOf("]]")+2);
+      let choices = sub.split("|");
+      
+      el.innerHTML = e.TEXT.substring(0, e.TEXT.indexOf("[[")) + "<span></span>" + e.TEXT.substring(e.TEXT.indexOf("]]")+2);
+      
+      var span = document.createElement("span");
+      var a1 = document.createElement("a");
+      var a2 = document.createElement("a");
+      a1.classList.add("selected");
+      a1.innerHTML = choices[0].replace("[[","");
+      a2.innerHTML = choices[1].replace("]]","");
+      
+      a1.onclick = function() {
+        player.nextEvent.choice = 2;
+        this.classList.remove("selected");
+        this.nextElementSibling.classList.add("selected");
+      };
+      a2.onclick = function() {
+        player.nextEvent.choice = 1;
+        this.classList.remove("selected");
+        this.parentElement.firstElementChild.classList.add("selected");
+      };
+      
+      span.appendChild(a1);
+      span.appendChild(a2);
+      el.querySelector("span").replaceWith(span);
+    } else {
+      el.innerHTML = e.TEXT;
+    }
     
     var images = document.createElement("div");
     images.classList.add("images");
@@ -142,7 +203,29 @@
   }
   
   function applyResults(results) {
+    // player.energy -= DATA.locations[player.location]["ENERGY REQUIREMENT"];
+    // player.energy = Math.max(Math.min(player.energy, 4), 0);
     
+    // console.log(player.energy);
+    
+    if (!results) return;
+    
+    var array = results.split("\n");
+    
+    for (let line of array) {
+      var lsplit;
+      var sign;
+      if (line.includes(" += ")) {
+        lsplit = line.split(" += ");
+        sign = 1;
+      } else {
+        lsplit = line.split(" -= ");
+        sign = -1;
+      }
+      
+      player[lsplit[0]] += sign * parseInt(lsplit[1]);
+      player[lsplit[0]] = Math.max(Math.min(player[lsplit[0]], 4), 0);
+    }
   }
   
   container.onscroll = function(e) {
